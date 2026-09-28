@@ -39,9 +39,10 @@ vi.mock("@/hooks/useGetFeedbackPr", () => ({
 vi.mock("@/hooks/mutations/useRepairFeedbackPr", () => ({
   default: () => ({ mutate: vi.fn(), isPending: false }),
 }))
+const setScoreOverride = vi.fn()
 vi.mock("@/hooks/mutations/useSetScoreOverride", () => ({
   useSetScoreOverride: () => ({
-    mutate: vi.fn(),
+    mutate: setScoreOverride,
     isPending: false,
     isError: false,
     reset: vi.fn(),
@@ -104,6 +105,7 @@ beforeEach(() => {
   collaborators.mockReturnValue({ data: undefined })
   downloadSubmission.mockReset()
   feedbackRefetch.mockReset()
+  setScoreOverride.mockReset()
   // A successful window.open returns a window whose opener the component nulls.
   vi.stubGlobal(
     "open",
@@ -584,6 +586,265 @@ describe("SubmissionsTable score override on a no-autograder manual assignment",
         name: "submissions.scoreOverride.addLabel",
       }),
     ).toBeTruthy()
+  })
+})
+
+// Issue #1080: a manual-graded group assignment is never autograded, so every
+// group row is either a repo nobody pushed to or a pushed-but-uncollected
+// (pending) row. Both must offer "Add score" like the individual rows do, once
+// the members a new entry credits are known.
+describe("SubmissionsTable manual grading on group assignments", () => {
+  const overrideGrade = {
+    org: "acme",
+    classroom: "cs101",
+    assignment: "hw1",
+    assignmentType: "group" as const,
+    mode: "manual" as const,
+    maxPoints: 10,
+  }
+  const students = [
+    student(),
+    student({ username: "bob", first_name: "Bob" }),
+    student({ username: "cara", first_name: "Cara" }),
+  ]
+  const members = new Map([["alice", ["alice", "bob"]]])
+  const addButton = () =>
+    screen.queryByRole("button", { name: "submissions.scoreOverride.addLabel" })
+
+  it("offers Add score on an unsubmitted group repo once its members are known", () => {
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        skipsGrading
+        overrideGrade={overrideGrade}
+        groupMemberLogins={members}
+        unsubmittedGroupRepos={[
+          { owner: "alice", repoName: "cs101-hw1-alice" },
+        ]}
+      />,
+    )
+    expect(addButton()).toBeTruthy()
+  })
+
+  it("withholds Add score on an unsubmitted group repo whose members are unresolved", () => {
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        skipsGrading
+        overrideGrade={overrideGrade}
+        groupMemberLogins={new Map()}
+        unsubmittedGroupRepos={[
+          { owner: "alice", repoName: "cs101-hw1-alice" },
+        ]}
+      />,
+    )
+    expect(addButton()).toBeNull()
+  })
+
+  it("keeps the em-dash on an unsubmitted group repo of an autograded assignment", () => {
+    // Like the individual non-submitter row: nothing to override before a
+    // submission exists.
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        overrideGrade={{ ...overrideGrade, mode: "auto", maxPoints: undefined }}
+        groupMemberLogins={members}
+        unsubmittedGroupRepos={[
+          { owner: "alice", repoName: "cs101-hw1-alice" },
+        ]}
+      />,
+    )
+    expect(addButton()).toBeNull()
+  })
+
+  it("offers Add score on a pending group row despite skipsGrading once members are known", () => {
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        skipsGrading
+        overrideGrade={overrideGrade}
+        groupMemberLogins={members}
+        scores={[
+          scoreRow({
+            owner: "alice",
+            usernames: ["alice"],
+            pending: true,
+            score: 0,
+            "max-score": 0,
+          }),
+        ]}
+      />,
+    )
+    expect(addButton()).toBeTruthy()
+    expect(screen.queryByTitle("submissions.table.noGradingTitle")).toBeNull()
+  })
+
+  it("withholds the editor on a pending group row until its members resolve", () => {
+    // A pending row only knows the founder; saving now would credit the group
+    // as [founder] alone.
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        overrideGrade={overrideGrade}
+        groupMemberLogins={new Map()}
+        scores={[
+          scoreRow({
+            owner: "alice",
+            usernames: ["alice"],
+            pending: true,
+            score: 0,
+            "max-score": 0,
+          }),
+        ]}
+      />,
+    )
+    expect(addButton()).toBeNull()
+  })
+
+  it("still offers the editor on a collected group row with unresolved members", () => {
+    // The entry already exists and keeps its recorded member_usernames, so
+    // there is nothing to wait for.
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        overrideGrade={overrideGrade}
+        groupMemberLogins={new Map()}
+        scores={[scoreRow({ owner: "alice", usernames: ["alice", "bob"] })]}
+      />,
+    )
+    expect(
+      screen.getByRole("button", {
+        name: "submissions.scoreOverride.editLabel",
+      }),
+    ).toBeTruthy()
+  })
+
+  it("credits the resolved members when saving a new group grade", async () => {
+    const user = userEvent.setup()
+    render(
+      <SubmissionsTable
+        {...baseProps}
+        students={students}
+        isGroup
+        skipsGrading
+        overrideGrade={overrideGrade}
+        groupMemberLogins={members}
+        unsubmittedGroupRepos={[
+          { owner: "alice", repoName: "cs101-hw1-alice" },
+        ]}
+      />,
+    )
+    await user.click(addButton()!)
+    await user.type(
+      screen.getByLabelText("submissions.scoreOverride.inputLabel"),
+      "7",
+    )
+    await user.click(
+      screen.getByRole("button", { name: "submissions.scoreOverride.save" }),
+    )
+    expect(setScoreOverride).toHaveBeenCalledTimes(1)
+    expect(setScoreOverride.mock.calls[0][0]).toMatchObject({
+      owner: "alice",
+      assignmentType: "group",
+      memberUsernames: ["alice", "bob"],
+      score: 7,
+      maxPoints: 10,
+    })
+  })
+
+  // The relaxed guard also reaches autograded assignments: a pending group row
+  // (pushed, not yet collected) can be graded ahead of collection like a
+  // pending individual row, with the teacher entering the max. Pinned here so
+  // the widening is deliberate rather than incidental.
+  describe("autograded pending group rows", () => {
+    const autoGrade = {
+      ...overrideGrade,
+      assignmentType: "team" as const,
+      mode: "auto" as const,
+      maxPoints: undefined,
+    }
+    const team: GroupTeamRef = {
+      slug: "classroom50-group-abc123-1",
+      id: 101,
+      n: 1,
+      name: "Rocket",
+    }
+    const pendingTeamRow = scoreRow({
+      owner: "group-1",
+      usernames: ["alice"],
+      pending: true,
+      score: 0,
+      "max-score": 0,
+    })
+
+    it("offers the editor once members resolve and credits them on save", async () => {
+      const user = userEvent.setup()
+      render(
+        <SubmissionsTable
+          {...baseProps}
+          students={students}
+          isGroup
+          isTeam
+          teamsSettled
+          teamsByOwner={new Map([["group-1", team]])}
+          groupMemberLogins={new Map([["group-1", ["alice", "bob"]]])}
+          overrideGrade={autoGrade}
+          scores={[pendingTeamRow]}
+        />,
+      )
+      expect(screen.getByText("submissions.table.pendingGrade")).toBeTruthy()
+      await user.click(addButton()!)
+      await user.type(
+        screen.getByLabelText("submissions.scoreOverride.inputLabel"),
+        "7",
+      )
+      await user.type(
+        screen.getByLabelText("submissions.scoreOverride.maxLabel"),
+        "10",
+      )
+      await user.click(
+        screen.getByRole("button", { name: "submissions.scoreOverride.save" }),
+      )
+      expect(setScoreOverride).toHaveBeenCalledTimes(1)
+      expect(setScoreOverride.mock.calls[0][0]).toMatchObject({
+        owner: "group-1",
+        assignmentType: "team",
+        memberUsernames: ["alice", "bob"],
+        teamSlug: team.slug,
+        score: 7,
+        maxPoints: 10,
+      })
+    })
+
+    it("withholds the editor while the team's members are unresolved", () => {
+      render(
+        <SubmissionsTable
+          {...baseProps}
+          students={students}
+          isGroup
+          isTeam
+          teamsSettled
+          teamsByOwner={new Map([["group-1", team]])}
+          groupMemberLogins={new Map()}
+          overrideGrade={autoGrade}
+          scores={[pendingTeamRow]}
+        />,
+      )
+      expect(screen.getByText("submissions.table.pendingGrade")).toBeTruthy()
+      expect(addButton()).toBeNull()
+    })
   })
 })
 
