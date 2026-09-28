@@ -16,11 +16,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/localgit"
+	"github.com/foundation50/classroom50-cli-shared/reponame"
 	"github.com/foundation50/gh-student/internal/assignments"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
 	"github.com/foundation50/gh-student/internal/githubapi"
-	"github.com/foundation50/gh-student/internal/localgit"
-	"github.com/foundation50/gh-student/internal/reponame"
 )
 
 func NewCmd() *cobra.Command {

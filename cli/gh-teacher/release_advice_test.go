@@ -3,9 +3,9 @@ package main
 import (
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/updatecheck"
-	"github.com/foundation50/gh-teacher/internal/assignment"
 )
 
 // TestReleaseAdviceWiring pins what main needs for the release follow-up: the

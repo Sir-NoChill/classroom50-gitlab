@@ -16,9 +16,9 @@ import (
 	"github.com/cli/go-gh/v2/pkg/api"
 	"gopkg.in/yaml.v3"
 
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
-	"github.com/foundation50/gh-teacher/internal/assignment"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 )
 
@@ -1181,7 +1181,7 @@ func TestSkeletonFiles_AutogradeRunnerSkipsReservedReleaseAssetBasenamesCaseInse
 }
 
 // TestRegexParity_GoVsInlinePython enforces that the regex/allow-list
-// constants duplicated between cli/gh-teacher/internal/assignment/runtime.go
+// constants duplicated between cli/shared/assignment/runtime.go
 // and the inline Python validator in autograde-runner.yaml stay in lockstep.
 // Drift would let the CLI write a value the runtime workflow rejects
 // (or vice versa), surfacing only on the next student submission.

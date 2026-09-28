@@ -25,15 +25,15 @@ import (
 	"github.com/cli/go-gh/v2/pkg/auth"
 	"github.com/spf13/cobra"
 
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghui"
 	"github.com/foundation50/classroom50-cli-shared/gitexec"
-	"github.com/foundation50/gh-teacher/internal/assignment"
+	scoresschema "github.com/foundation50/classroom50-cli-shared/scores"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
 	"github.com/foundation50/gh-teacher/internal/orgrepos"
-	scoresschema "github.com/foundation50/gh-teacher/internal/scores"
 )
 
 // dirTimestampFormat: filesystem-safe and lexicographically sortable.

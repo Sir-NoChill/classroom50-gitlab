@@ -3,13 +3,13 @@ package configrepo
 import (
 	"fmt"
 
-	"github.com/foundation50/gh-teacher/internal/assignment"
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // LoadAssignments reads and parses a classroom's assignments.json at `ref`.
 // Mirrors LoadRoster/LoadClassroom: the read substrate lives here, the typed
-// shape + parse logic in internal/assignment. A missing file is an actionable
+// shape + parse logic in cli/shared/assignment. A missing file is an actionable
 // error.
 func LoadAssignments(client githubapi.Client, org, classroom, ref string) (assignment.AssignmentsJSON, error) {
 	path := assignment.AssignmentsFilePath(classroom)

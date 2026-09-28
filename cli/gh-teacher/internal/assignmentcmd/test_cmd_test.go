@@ -12,7 +12,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/assignment"
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/gh-teacher/internal/githubtest"
 )
 

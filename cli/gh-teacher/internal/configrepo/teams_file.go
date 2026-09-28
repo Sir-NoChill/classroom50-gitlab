@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
-	"github.com/foundation50/gh-teacher/internal/output"
 )
 
 // TeamsFile is the typed on-disk shape of <classroom>/teams.json

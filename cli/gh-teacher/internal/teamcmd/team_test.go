@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
-	"github.com/foundation50/gh-teacher/internal/assignment"
 )
 
 // resolveTeamArg maps a bare counter or a full slug to the assignment's team

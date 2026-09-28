@@ -42,8 +42,8 @@ def test_all_short_name_mirrors_match() -> None:
         "schemas/scores-v1.schema.json": _schema_short_name_pattern(
             "schemas/scores-v1.schema.json"
         ),
-        "cli/gh-teacher/internal/validate/validate.go": _extract(
-            "cli/gh-teacher/internal/validate/validate.go",
+        "cli/shared/validate/validate.go": _extract(
+            "cli/shared/validate/validate.go",
             r"ShortNamePattern = regexp\.MustCompile\(`([^`]+)`\)",
         ),
         "cli/gh-teacher/skeleton/dotgithub/scripts/materialize_tests.py": _extract(

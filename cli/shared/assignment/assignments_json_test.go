@@ -21,7 +21,7 @@ import (
 // CI rather than surfacing as a CLI/GUI/schema disagreement. The web mirror
 // (REPO_PERMISSIONS) is pinned against the same schema enum by a vitest.
 func TestStudentPermissionEnumParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}
@@ -59,7 +59,7 @@ func TestStudentPermissionEnumParity(t *testing.T) {
 // web mirror (SUBMISSION_MODES) is pinned against the same schema enum by a
 // vitest, and the runner's inline validator carries a by-value copy.
 func TestSubmissionModeEnumParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}
@@ -97,7 +97,7 @@ func TestSubmissionModeEnumParity(t *testing.T) {
 // web mirror (REPO_VISIBILITIES) is pinned against the same schema enum by a
 // vitest.
 func TestRepoVisibilityEnumParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}
@@ -133,7 +133,7 @@ func TestRepoVisibilityEnumParity(t *testing.T) {
 // the schema's pages.source / pages.path enums (the declared source of truth);
 // the web mirror (PAGES_SOURCES / PAGES_PATHS) is pinned by a vitest.
 func TestPagesEnumParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}
@@ -240,7 +240,7 @@ func TestPagesRoundTripsAndExcludesEmptyRepo(t *testing.T) {
 // wording, and a one-sided drop reintroduces the #654 ambiguity. Update all
 // three copies in lockstep so the shared phrases survive.
 func TestSubmissionModeReaderRuleParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}
@@ -319,7 +319,7 @@ func TestSubmissionModeReaderRuleParity(t *testing.T) {
 // the Go contract.GradingModes (what ValidateGrading enforces). The web mirror
 // (GRADING_MODES) is pinned against the same schema enum by a vitest.
 func TestGradingModeEnumParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}

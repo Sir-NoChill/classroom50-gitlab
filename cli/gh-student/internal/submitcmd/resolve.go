@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
+	"github.com/foundation50/classroom50-cli-shared/reponame"
 	"github.com/foundation50/gh-student/internal/assignments"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
 	"github.com/foundation50/gh-student/internal/githubapi"
-	"github.com/foundation50/gh-student/internal/reponame"
 	"github.com/foundation50/gh-student/internal/ui"
 )
 

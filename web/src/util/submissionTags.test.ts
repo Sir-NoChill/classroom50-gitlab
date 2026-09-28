@@ -107,7 +107,7 @@ describe("safeShimTagPatterns — render-time fail-closed gate", () => {
 // The web half of the constant lockstep: SUBMISSION_TAGS_CAP and
 // SUBMISSION_TAG_PATTERN_RE must mirror the schema (declared source of
 // truth). The Go half is TestSubmissionTagsSchemaParity
-// (cli/gh-teacher/internal/assignment/submission_tags_test.go).
+// (cli/shared/assignment/submission_tags_test.go).
 describe("submission_tags constants parity with assignments-v1 schema", () => {
   const schemaUrl = new URL(
     "../../../schemas/assignments-v1.schema.json",

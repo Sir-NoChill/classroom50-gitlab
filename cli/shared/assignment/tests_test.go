@@ -553,7 +553,7 @@ func TestParseTestsFile_ShowOutputFalseRoundTrips(t *testing.T) {
 // Compared as sorted sets: the schema lists the default (`full`) first, while
 // the Go slice is sorted for stable error messages.
 func TestFailureDetailsEnumParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}

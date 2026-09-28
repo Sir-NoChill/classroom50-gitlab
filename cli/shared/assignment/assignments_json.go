@@ -24,9 +24,9 @@ import (
 	"unicode"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/classroom50-cli-shared/updatecheck"
-	"github.com/foundation50/gh-teacher/internal/output"
-	"github.com/foundation50/gh-teacher/internal/validate"
+	"github.com/foundation50/classroom50-cli-shared/validate"
 )
 
 // Assignment modes, single-sourced from the shared contract: `individual`

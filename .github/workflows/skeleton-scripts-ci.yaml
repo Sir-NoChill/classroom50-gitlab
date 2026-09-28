@@ -37,6 +37,7 @@ on:
       # scripts' hand-mirrored constants against, plus the shared fixtures.
       - 'cli/shared/contract/**'
       - 'cli/shared/testdata/**'
+      - 'cli/shared/validate/**'
       - 'cli/gh-teacher/init.go'
       - 'cli/gh-teacher/internal/download/**'
       - 'cli/gh-teacher/internal/servicetoken/**'
@@ -58,6 +59,7 @@ on:
       - 'examples/declarative-tests/tests.json'
       - 'cli/shared/contract/**'
       - 'cli/shared/testdata/**'
+      - 'cli/shared/validate/**'
       - 'cli/gh-teacher/init.go'
       - 'cli/gh-teacher/internal/download/**'
       - 'cli/gh-teacher/internal/servicetoken/**'

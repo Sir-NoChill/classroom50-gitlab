@@ -10,10 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/foundation50/classroom50-cli-shared/output"
+	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
-	"github.com/foundation50/gh-teacher/internal/output"
-	"github.com/foundation50/gh-teacher/internal/validate"
 )
 
 // rosterListEntry is the `--json` view of one roster.csv row. Field names

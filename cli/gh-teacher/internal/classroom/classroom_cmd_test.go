@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/githubtest"
 	"github.com/foundation50/gh-teacher/internal/orgrules"
-	"github.com/foundation50/gh-teacher/internal/output"
 )
 
 // configRepoMock is a minimal in-memory <org>/classroom50 server

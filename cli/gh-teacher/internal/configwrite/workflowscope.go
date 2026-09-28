@@ -3,8 +3,8 @@ package configwrite
 import (
 	"errors"
 
+	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
-	"github.com/foundation50/gh-teacher/internal/validate"
 )
 
 // ErrMissingWorkflowScope: no `workflow` OAuth scope, so GitHub 404s the

@@ -10,7 +10,7 @@ import (
 
 // sharedMatcherCasesPath locates the cross-language golden fixture
 // (also consumed by the Python runner.py test) relative to this package.
-const sharedMatcherCasesPath = "../../../shared/testdata/allowed_files_matcher_cases.json"
+const sharedMatcherCasesPath = "../testdata/allowed_files_matcher_cases.json"
 
 type matcherCase struct {
 	Name       string   `json:"name"`

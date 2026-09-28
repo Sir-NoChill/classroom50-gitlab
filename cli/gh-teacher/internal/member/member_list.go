@@ -16,9 +16,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
 	"github.com/foundation50/gh-teacher/internal/membership"
-	"github.com/foundation50/gh-teacher/internal/output"
 )
 
 // memberListEntry is one row of `member list` output. Kind separates the

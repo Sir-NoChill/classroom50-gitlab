@@ -62,7 +62,7 @@ func TestValidateSubmissionTags(t *testing.T) {
 // (SUBMISSION_TAGS_CAP / SUBMISSION_TAG_PATTERN_RE) is pinned by its own
 // vitest against the same schema.
 func TestSubmissionTagsSchemaParity(t *testing.T) {
-	root, err := filepath.Abs(filepath.Join("..", "..", "..", ".."))
+	root, err := filepath.Abs(filepath.Join("..", "..", ".."))
 	if err != nil {
 		t.Fatalf("resolve repo root: %v", err)
 	}

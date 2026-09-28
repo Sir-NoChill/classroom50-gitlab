@@ -8,13 +8,13 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
-	"github.com/foundation50/gh-teacher/internal/assignment"
+	"github.com/foundation50/classroom50-cli-shared/output"
+	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/configwrite"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
-	"github.com/foundation50/gh-teacher/internal/output"
-	"github.com/foundation50/gh-teacher/internal/validate"
 )
 
 // assignmentTestCmd is the `gh teacher assignment test` command group: add /

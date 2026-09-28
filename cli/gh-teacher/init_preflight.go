@@ -10,12 +10,12 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/ghauth"
+	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
 	"github.com/foundation50/gh-teacher/internal/servicetoken"
 	"github.com/foundation50/gh-teacher/internal/ui"
-	"github.com/foundation50/gh-teacher/internal/validate"
 )
 
 // preflightStatus is the outcome of a single preflight check, aliased to

@@ -19,11 +19,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/gitexec"
-	"github.com/foundation50/gh-teacher/internal/assignment"
+	scoresschema "github.com/foundation50/classroom50-cli-shared/scores"
 	"github.com/foundation50/gh-teacher/internal/githubtest"
-	scoresschema "github.com/foundation50/gh-teacher/internal/scores"
 )
 
 func TestAssignmentRepoName(t *testing.T) {

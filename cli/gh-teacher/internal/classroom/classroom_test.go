@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/assignment"
+	"github.com/foundation50/classroom50-cli-shared/assignment"
+	"github.com/foundation50/classroom50-cli-shared/scores"
+	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/scores"
-	"github.com/foundation50/gh-teacher/internal/validate"
 )
 
 func TestValidateShortName(t *testing.T) {
