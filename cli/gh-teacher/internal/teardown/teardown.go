@@ -16,9 +16,9 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghui"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 	"github.com/foundation50/gh-teacher/internal/orgrepos"
 	"github.com/foundation50/gh-teacher/internal/orgrules"
 )
@@ -54,7 +54,7 @@ func NewCmd() *cobra.Command {
 			if org == "" {
 				return errors.New("org must not be empty")
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

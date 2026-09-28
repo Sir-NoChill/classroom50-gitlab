@@ -8,7 +8,7 @@ import (
 
 	"github.com/cli/go-gh/v2/pkg/api"
 
-	"github.com/foundation50/gh-student/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 // hostRewriteTransport redirects every request to a single test server while
@@ -27,13 +27,8 @@ func (h *hostRewriteTransport) RoundTrip(req *http.Request) (*http.Response, err
 
 // NewTestClient wires a real go-gh client at the given test server, returned as
 // the githubapi.Client seam. AuthToken must be non-empty so go-gh's
-// header-injection layer leaves Authorization alone.
-//
-// This is the shared white-box test helper for gh-student: domain tests
-// construct a Client here instead of reaching into the concrete go-gh
-// constructor, so the go-gh dependency stays confined to githubapi and this
-// package. Mirrors cli/gh-teacher/internal/githubtest (separate Go modules, so
-// the helper can't be shared).
+// header-injection layer leaves Authorization alone. The shared white-box
+// helper that keeps the go-gh dependency confined to githubapi and this package.
 func NewTestClient(t *testing.T, server *httptest.Server) githubapi.Client {
 	t.Helper()
 	u, err := url.Parse(server.URL)

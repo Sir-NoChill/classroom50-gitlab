@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strings"
 
+	ghapi "github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
@@ -32,7 +33,7 @@ var plansThatSupportPrivatePages = map[string]bool{
 // complete=true only when every *critical* lockdown field landed (the fields
 // that defang the founder-admin grant org-wide). init warns "lockdown
 // INCOMPLETE" when complete=false so a half-locked org isn't hidden.
-func applyOrgMemberDefaults(client githubapi.Client, out, errOut io.Writer, org, plan string) (complete bool, unenforced []unenforcedSetting, err error) {
+func applyOrgMemberDefaults(client ghapi.Client, out, errOut io.Writer, org, plan string) (complete bool, unenforced []unenforcedSetting, err error) {
 	settings := orgpolicy.MemberDefaultSettings(plan)
 	combined := make(map[string]any, len(settings))
 	for _, s := range settings {
@@ -95,7 +96,7 @@ type unenforcedSetting struct {
 // source of truth (what the teacher sees in the settings UI). ok is true when
 // nothing critical is unenforced. A read failure returns ok=true with one
 // warning (the writes reported success; don't manufacture a false checklist).
-func verifyOrgDefaults(client githubapi.Client, errOut io.Writer, org, plan string) (ok bool, unenforced []unenforcedSetting) {
+func verifyOrgDefaults(client ghapi.Client, errOut io.Writer, org, plan string) (ok bool, unenforced []unenforcedSetting) {
 	path := fmt.Sprintf("orgs/%s", url.PathEscape(org))
 	var live map[string]any
 	if err := client.Get(path, &live); err != nil {
@@ -140,7 +141,7 @@ func unenforcedCause(plan string) string {
 // "set it manually", but a rate-limit 403 is transient (retry), not a field to
 // toggle by hand.
 func isSecondaryRateLimit(err error) bool {
-	httpErr, ok := errors.AsType[*githubapi.HTTPError](err)
+	httpErr, ok := errors.AsType[*ghapi.HTTPError](err)
 	if !ok {
 		return false
 	}
@@ -169,7 +170,7 @@ func orgMemberDefaultsSummary(plan string) string {
 // (verifyOrgDefaults). A transient (non-403/422) error mid-loop aborts init but
 // first reports which policies landed and which were never attempted, since the
 // org is left partially mutated.
-func applyOrgMemberDefaultsPerField(client githubapi.Client, out, errOut io.Writer, org, plan string) (complete bool, unenforced []unenforcedSetting, err error) {
+func applyOrgMemberDefaultsPerField(client ghapi.Client, out, errOut io.Writer, org, plan string) (complete bool, unenforced []unenforcedSetting, err error) {
 	path := fmt.Sprintf("orgs/%s", url.PathEscape(org))
 	settingsURL := fmt.Sprintf("https://github.com/organizations/%s/settings/member_privileges", org)
 	settings := orgpolicy.MemberDefaultSettings(plan)
@@ -251,7 +252,7 @@ func reportPartialMemberDefaults(errOut io.Writer, org string, settings []orgpol
 // Create-only and never fatal: the budget cap is a guardrail, not a
 // prerequisite for the classroom to work. Returns the reconciliation status
 // for the summary (see initSummary.BudgetCap for the values).
-func ensureOrgActionsBudgetCap(client githubapi.Client, out, errOut io.Writer, org string) string {
+func ensureOrgActionsBudgetCap(client ghapi.Client, out, errOut io.Writer, org string) string {
 	settingsURL := orgpolicy.OrgBudgetsURL(org)
 
 	budgets, err := githubapi.ListOrgBudgets(client, org)
@@ -303,7 +304,7 @@ type orgActionsPermissions struct {
 // ("none" → PUT "all"); Classroom50's workflows never run otherwise. "all" →
 // noop; "selected"/unknown → warn. Read failures and a rejected enable
 // (403/409/422, usually enterprise-locked) warn and continue.
-func ensureOrgActionsEnabled(client githubapi.Client, out, errOut io.Writer, org string) error {
+func ensureOrgActionsEnabled(client ghapi.Client, out, errOut io.Writer, org string) error {
 	path := fmt.Sprintf("orgs/%s/actions/permissions", url.PathEscape(org))
 
 	var perms orgActionsPermissions
@@ -379,7 +380,7 @@ type orgWorkflowPermissions struct {
 // already do. Residual: if a teacher later adds a required-review rule, a
 // student-controlled token could satisfy it via self-approval (documented in
 // the wiki).
-func ensureOrgCanCreatePRs(client githubapi.Client, out, errOut io.Writer, org string) (bool, error) {
+func ensureOrgCanCreatePRs(client ghapi.Client, out, errOut io.Writer, org string) (bool, error) {
 	path := fmt.Sprintf("orgs/%s/actions/permissions/workflow", url.PathEscape(org))
 
 	var current orgWorkflowPermissions
@@ -427,7 +428,7 @@ type repoActionsPermissions struct {
 // the repo level (`enabled` false → PUT true), independent of the org setting.
 // A read failure or rejected enable (403/409/422, usually org/enterprise
 // policy) warns and continues.
-func ensureRepoActionsEnabled(client githubapi.Client, out, errOut io.Writer, owner, repo string) error {
+func ensureRepoActionsEnabled(client ghapi.Client, out, errOut io.Writer, owner, repo string) error {
 	path := fmt.Sprintf("repos/%s/%s/actions/permissions", url.PathEscape(owner), url.PathEscape(repo))
 
 	var perms repoActionsPermissions
@@ -473,7 +474,7 @@ func ensureRepoActionsEnabled(client githubapi.Client, out, errOut io.Writer, ow
 // ensureConfigRepo returns the classroom50 repo for <org>, creating it if
 // absent. 422 → name taken; fall back to GET so re-runs succeed.
 // default_branch flows through so an org policy rename doesn't break bootstrap.
-func ensureConfigRepo(client githubapi.Client, org string) (repo configrepo.ConfigRepo, created bool, err error) {
+func ensureConfigRepo(client ghapi.Client, org string) (repo configrepo.ConfigRepo, created bool, err error) {
 	body, err := json.Marshal(struct {
 		Name     string `json:"name"`
 		Private  bool   `json:"private"`
@@ -507,7 +508,7 @@ func ensureConfigRepo(client githubapi.Client, org string) (repo configrepo.Conf
 // 409 on create → "already enabled"; the visibility PUT fires either way so
 // re-runs reconcile a previously-private site. Success on `out`; the
 // visibility step warns to `errOut` if the API rejects it.
-func enablePages(client githubapi.Client, out, errOut io.Writer, owner, repo string) error {
+func enablePages(client ghapi.Client, out, errOut io.Writer, owner, repo string) error {
 	body, err := json.Marshal(struct {
 		BuildType string `json:"build_type"`
 	}{BuildType: "workflow"})
@@ -532,7 +533,7 @@ func enablePages(client githubapi.Client, out, errOut io.Writer, owner, repo str
 // Enterprise-Cloud-only; every other plan is unconditionally public — exactly
 // what init wants, so this is a success, not a warning.
 func isPrivatePagesUnsupported(err error) bool {
-	httpErr, ok := errors.AsType[*githubapi.HTTPError](err)
+	httpErr, ok := errors.AsType[*ghapi.HTTPError](err)
 	return ok && httpErr.StatusCode == http.StatusBadRequest &&
 		strings.Contains(httpErr.Message, "Private pages is not enabled")
 }
@@ -542,7 +543,7 @@ func isPrivatePagesUnsupported(err error) bool {
 // Visibility radio drives). 204 → success; the no-visibility-control 400 (see
 // isPrivatePagesUnsupported) is also success; any other status warns to
 // `errOut` and returns nil so a quirky org policy doesn't fail init.
-func setPagesPublic(client githubapi.Client, out, errOut io.Writer, owner, repo string) error {
+func setPagesPublic(client ghapi.Client, out, errOut io.Writer, owner, repo string) error {
 	body, err := json.Marshal(struct {
 		Public bool `json:"public"`
 	}{Public: true})
@@ -584,7 +585,7 @@ func setPagesPublic(client githubapi.Client, out, errOut io.Writer, owner, repo 
 // readPagesPublic GETs the repo Pages config and returns whether the site is
 // public. known=false on any read failure so the caller treats an unverifiable
 // read-back as non-blocking.
-func readPagesPublic(client githubapi.Client, owner, repo string) (public, known bool) {
+func readPagesPublic(client ghapi.Client, owner, repo string) (public, known bool) {
 	path := fmt.Sprintf("repos/%s/%s/pages", url.PathEscape(owner), url.PathEscape(repo))
 	var resp struct {
 		Public bool `json:"public"`
@@ -600,7 +601,7 @@ func readPagesPublic(client githubapi.Client, owner, repo string) (public, known
 // collect-scores.yaml and the CLI Tree-API writes both target the default
 // branch directly and would be blocked. Force-push + delete blocking bounds the
 // blast radius of an account compromise.
-func applyBranchProtection(client githubapi.Client, out io.Writer, owner, repo, branch string) error {
+func applyBranchProtection(client ghapi.Client, out io.Writer, owner, repo, branch string) error {
 	// Classic branch protection requires the four null fields present (not
 	// omitted); a JSON literal beats juggling pointer types.
 	body := []byte(`{
@@ -631,7 +632,7 @@ func applyBranchProtection(client githubapi.Client, out io.Writer, owner, repo, 
 // workflow that doesn't. (GitHub's new-repo default flipped to read-only in
 // 2023.) 409 → org enforces a unified policy; reportOrgWorkflowPermissions
 // logs the effective setting and continues.
-func setWorkflowPermissions(client githubapi.Client, out io.Writer, owner, repo string) error {
+func setWorkflowPermissions(client ghapi.Client, out io.Writer, owner, repo string) error {
 	body, err := json.Marshal(struct {
 		DefaultWorkflowPermissions   string `json:"default_workflow_permissions"`
 		CanApprovePullRequestReviews bool   `json:"can_approve_pull_request_reviews"`
@@ -663,7 +664,7 @@ func setWorkflowPermissions(client githubapi.Client, out io.Writer, owner, repo 
 // reportOrgWorkflowPermissions logs the effective setting (the org value under
 // enforced policy). Always returns nil — a `read` default doesn't break
 // bootstrap because skeleton workflows declare their own permissions.
-func reportOrgWorkflowPermissions(client githubapi.Client, out io.Writer, owner, repo string) error {
+func reportOrgWorkflowPermissions(client ghapi.Client, out io.Writer, owner, repo string) error {
 	path := fmt.Sprintf("repos/%s/%s/actions/permissions/workflow",
 		url.PathEscape(owner), url.PathEscape(repo))
 	var resp struct {
@@ -691,7 +692,7 @@ func reportOrgWorkflowPermissions(client githubapi.Client, out io.Writer, owner,
 // PUT .../actions/permissions/access with `access_level: organization` is the
 // per-repo lever; idempotent. 403/409 (org-enforced) → warn to errOut, since
 // some orgs lock this at the enterprise layer.
-func enableReusableWorkflowAccess(client githubapi.Client, out, errOut io.Writer, owner, repo string) error {
+func enableReusableWorkflowAccess(client ghapi.Client, out, errOut io.Writer, owner, repo string) error {
 	body, err := json.Marshal(struct {
 		AccessLevel string `json:"access_level"`
 	}{AccessLevel: "organization"})

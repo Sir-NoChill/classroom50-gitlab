@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 func TestParseTemplateRef_HappyPaths(t *testing.T) {

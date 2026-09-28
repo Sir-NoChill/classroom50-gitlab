@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/foundation50/gh-student/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // TestCommitFiles_RetriesOnFreshRepoLag pins the behavioral change when

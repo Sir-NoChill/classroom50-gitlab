@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // InviteDescription is the classroom50/invite/v1 record stored in a per-invite

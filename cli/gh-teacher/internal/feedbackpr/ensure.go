@@ -12,7 +12,7 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 // feedbackTemplateRef points the Feedback PR body at a template repo's native

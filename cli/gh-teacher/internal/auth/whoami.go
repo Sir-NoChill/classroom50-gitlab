@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/foundation50/gh-teacher/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 func NewWhoamiCmd() *cobra.Command {
@@ -15,7 +15,7 @@ func NewWhoamiCmd() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

@@ -23,9 +23,9 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 func NewCmd() *cobra.Command {
@@ -69,7 +69,7 @@ func NewCmd() *cobra.Command {
 				return fmt.Errorf("invalid arguments: org, classroom, and assignment must all be non-empty")
 			}
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

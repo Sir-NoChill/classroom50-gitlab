@@ -18,8 +18,8 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/repoconfig"
-	"github.com/foundation50/gh-student/internal/githubapi"
 )
 
 // MetadataPath aliases contract.MetadataPath (the accept marker and baseline

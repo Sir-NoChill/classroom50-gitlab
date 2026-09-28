@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/foundation50/classroom50-cli-shared/gitexec"
-	"github.com/foundation50/gh-student/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	identitypkg "github.com/foundation50/gh-student/internal/identity"
 )
 

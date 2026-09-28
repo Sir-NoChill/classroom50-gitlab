@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/foundation50/gh-student/internal/githubapi"
-	"github.com/foundation50/gh-student/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // initRepo creates a temp git repo hidden from the host's global/system git

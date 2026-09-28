@@ -24,9 +24,9 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghauth"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // readHiddenLine reads one line with echo off so the PAT never appears.
@@ -356,7 +356,7 @@ func NewRotateCmd() *cobra.Command {
 				return errors.New("org must not be empty")
 			}
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

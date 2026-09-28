@@ -4,8 +4,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/foundation50/gh-student/internal/githubapi"
-	"github.com/foundation50/gh-student/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // newTestRESTClient wires a real go-gh client at the test server, as the

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
 	"github.com/foundation50/gh-teacher/internal/orgrules"
 )
 

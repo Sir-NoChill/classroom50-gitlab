@@ -12,8 +12,8 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // ConfigRepoName is the per-org config repository name (<org>/classroom50).

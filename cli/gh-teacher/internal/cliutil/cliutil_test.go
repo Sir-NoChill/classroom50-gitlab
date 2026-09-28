@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 func TestIsHTTPStatus(t *testing.T) {

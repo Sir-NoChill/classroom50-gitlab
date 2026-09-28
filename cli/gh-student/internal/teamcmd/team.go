@@ -16,9 +16,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-student/internal/assignments"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
-	"github.com/foundation50/gh-student/internal/githubapi"
 	"github.com/foundation50/gh-student/internal/groupteam"
 )
 
@@ -77,7 +77,7 @@ func teamListCmd() *cobra.Command {
 			if err := validateKey(secret); err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh student")
 			if err != nil {
 				return err
 			}
@@ -160,7 +160,7 @@ func teamAddCmd() *cobra.Command {
 			if err := validateKey(secret); err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh student")
 			if err != nil {
 				return err
 			}

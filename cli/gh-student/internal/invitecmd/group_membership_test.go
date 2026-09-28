@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/classroom50-cli-shared/reponame"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
-	"github.com/foundation50/gh-student/internal/githubtest"
 )
 
 func TestGroupRepoOwner(t *testing.T) {

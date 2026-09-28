@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/configwrite"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // addressEntry is one address parsed from a --file list: the normalized email

@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // testCmdFixture wires the GitHub API surface the `assignment test`

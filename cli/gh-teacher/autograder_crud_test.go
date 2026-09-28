@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // autograderRepoMock is a minimal <org>/classroom50 server for the

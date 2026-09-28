@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
 )
 
 // bulkInviteMock serves the endpoints runRosterInviteFile touches for ANY

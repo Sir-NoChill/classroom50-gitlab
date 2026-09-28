@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // overBudgetSlug composes past GitHub's 100-char repo-name limit with the

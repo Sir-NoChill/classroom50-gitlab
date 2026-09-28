@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/gittree"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // ConfigRepo is the subset of the GitHub repo object the config-repo

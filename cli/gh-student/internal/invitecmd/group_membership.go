@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
-	"github.com/foundation50/gh-student/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 // listGroupMemberLogins returns the logins of student-level collaborators on

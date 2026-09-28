@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // TestCommitTreeChange_SendsDeletions verifies that deletes flow into

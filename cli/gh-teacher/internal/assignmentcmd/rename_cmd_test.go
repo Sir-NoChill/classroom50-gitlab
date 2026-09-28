@@ -12,7 +12,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // Rename-command fixture: org "o", classroom "cs" (57-char slug budget), an

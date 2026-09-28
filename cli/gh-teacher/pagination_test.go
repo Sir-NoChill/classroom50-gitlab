@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubapi"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // TestPaginateAll covers the shared paginator's behavior that no

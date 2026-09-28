@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/ghauth"
+	ghapi "github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
@@ -61,7 +62,7 @@ type tokenSource struct {
 // runPreflight runs every read-only check and returns the aggregate. Order is
 // deliberate: cheap local checks and the single org GET first, so a
 // misconfigured run fails fast.
-func runPreflight(client githubapi.Client, org string, tok tokenSource) preflightResult {
+func runPreflight(client ghapi.Client, org string, tok tokenSource) preflightResult {
 	var res preflightResult
 
 	// 1. Auth scopes — read X-OAuth-Scopes off a cheap GET; the same call
@@ -101,7 +102,7 @@ func runPreflight(client githubapi.Client, org string, tok tokenSource) prefligh
 // header, so we warn rather than fail (real ops fail loudly later). Returns the
 // check plus the raw scope string and the login (decoded from the same
 // response).
-func checkScopes(client githubapi.Client) (check preflightCheck, scopes, login string) {
+func checkScopes(client ghapi.Client) (check preflightCheck, scopes, login string) {
 	c := preflightCheck{Name: "auth scopes"}
 	resp, err := client.Request(http.MethodGet, "user", nil)
 	if err != nil {
@@ -121,7 +122,7 @@ func checkScopes(client githubapi.Client) (check preflightCheck, scopes, login s
 		return c, "", user.Login
 	}
 	var missing []string
-	for _, want := range githubapi.RequiredScopes() {
+	for _, want := range ghapi.RequiredScopes() {
 		if !validate.ScopeListSatisfies(scopes, want) {
 			missing = append(missing, want)
 		}
@@ -132,7 +133,7 @@ func checkScopes(client githubapi.Client) (check preflightCheck, scopes, login s
 		return c, scopes, user.Login
 	}
 	c.Status = preflightOK
-	c.Detail = fmt.Sprintf("%s present", strings.Join(githubapi.RequiredScopes(), ", "))
+	c.Detail = fmt.Sprintf("%s present", strings.Join(ghapi.RequiredScopes(), ", "))
 	return c, scopes, user.Login
 }
 
@@ -140,7 +141,7 @@ func checkScopes(client githubapi.Client) (check preflightCheck, scopes, login s
 // (empty when the caller lacks billing visibility). Any error is a hard fail
 // since every later step needs org access. The read lives in
 // githubapi.OrgPlan; this wrapper adds preflight framing and the 404 message.
-func checkOrgAccess(client githubapi.Client, org string) (preflightCheck, string) {
+func checkOrgAccess(client ghapi.Client, org string) (preflightCheck, string) {
 	c := preflightCheck{Name: "org access"}
 	plan, err := githubapi.OrgPlan(client, org)
 	if err != nil {
@@ -180,7 +181,7 @@ func planCheck(org, plan string) preflightCheck {
 // role "admin"). Only owners can apply the lockdown, so a member fails up front
 // rather than collecting 403s mid-run. A read failure is a warn. The login
 // comes from checkScopes, so this doesn't re-fetch /user.
-func checkOwnership(client githubapi.Client, org, login string) preflightCheck {
+func checkOwnership(client ghapi.Client, org, login string) preflightCheck {
 	c := preflightCheck{Name: "org ownership"}
 	if login == "" {
 		c.Status = preflightWarn

@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // adoptGuard decides whether an existing team at a canonical slug may be

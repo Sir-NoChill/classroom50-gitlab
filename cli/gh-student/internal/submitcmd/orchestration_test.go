@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/foundation50/gh-student/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 func TestFetchRepoPath(t *testing.T) {

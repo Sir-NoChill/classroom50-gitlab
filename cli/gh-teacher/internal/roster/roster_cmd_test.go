@@ -14,8 +14,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
 )
 
 // rosterWriteMock is a minimal in-memory <org>/classroom50 server covering

@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
-	"github.com/foundation50/gh-student/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 // counterCap bounds the 422-losing counter retry on create, mirroring the

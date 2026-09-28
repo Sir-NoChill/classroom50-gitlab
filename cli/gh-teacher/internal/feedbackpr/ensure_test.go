@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // ensureServer is a scriptable GitHub double for the teacher-side ensure flow

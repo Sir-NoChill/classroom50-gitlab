@@ -12,7 +12,7 @@ import (
 
 	"golang.org/x/crypto/nacl/box"
 
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 func TestServiceSecretExists(t *testing.T) {

@@ -13,10 +13,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/gh-student/internal/assignments"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
-	"github.com/foundation50/gh-student/internal/githubapi"
-	"github.com/foundation50/gh-student/internal/githubtest"
 	"github.com/foundation50/gh-student/internal/ui"
 )
 

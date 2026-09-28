@@ -16,12 +16,12 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/classroom50-cli-shared/scores"
 	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/configwrite"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 	"github.com/foundation50/gh-teacher/internal/orgrules"
 )
 
@@ -135,7 +135,7 @@ func classroomAddCmd() *cobra.Command {
 				return err
 			}
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -422,7 +422,7 @@ func classroomListCmd() *cobra.Command {
 			if org == "" {
 				return errors.New("org must not be empty")
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -540,7 +540,7 @@ func classroomEditCmd() *cobra.Command {
 			if !setName && !setTerm {
 				return errors.New("nothing to update: pass --name and/or --term")
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -651,7 +651,7 @@ func classroomArchiveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -679,7 +679,7 @@ func classroomUnarchiveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -771,7 +771,7 @@ func classroomRemoveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

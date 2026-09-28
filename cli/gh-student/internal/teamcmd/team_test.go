@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
-	"github.com/foundation50/gh-student/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // checkTeamCapacity is the `team add` size gate: an existing member is never

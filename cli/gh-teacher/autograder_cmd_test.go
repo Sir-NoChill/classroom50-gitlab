@@ -11,7 +11,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // TestDiagnosticStubEmbedded pins the embedded stub at build time so

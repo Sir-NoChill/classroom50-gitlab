@@ -12,12 +12,12 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/classroom50-cli-shared/validate"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/configwrite"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // assignmentReuseCmd copies an assignment record from one classroom's
@@ -107,7 +107,7 @@ func assignmentReuseCmd() *cobra.Command {
 			if fromClassroom == toClassroom && slugOverride == "" {
 				return errors.New("source and target classroom are the same: pass --slug to give the copy a distinct slug (an in-place reuse must rename)")
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

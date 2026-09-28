@@ -18,8 +18,8 @@ const (
 )
 
 // PaginateAll walks a GitHub `page`/`per_page` list endpoint, returning every
-// element across pages. The shared core for the teacher CLI's capped list
-// walks, replacing hand-rolled loops.
+// element across pages. The shared core for both CLIs' capped list walks,
+// replacing hand-rolled loops.
 //
 //   - pageURL(page) builds the path for a 1-based page (callers own
 //     per_page/page formatting). Only page 1 is built from pageURL; subsequent
@@ -47,9 +47,9 @@ func PaginateAll[T any](
 		}
 		all = append(all, batch...)
 
-		// Centralized termination via ghutil.NextPage (shared with the student
-		// CLI) so the predicate can't drift: follow `rel="next"`; stop on a
-		// no-next Link or a short no-Link page; else synthesize the next page.
+		// Centralized termination via ghutil.NextPage so the predicate can't
+		// drift: follow `rel="next"`; stop on a no-next Link or a short no-Link
+		// page; else synthesize the next page.
 		next, stop := ghutil.NextPage(linkHeader, len(batch), perPage)
 		if stop {
 			return all, nil
@@ -83,6 +83,7 @@ func GetPage[T any](client Client, path string) ([]T, string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&batch); err != nil {
 		return nil, "", fmt.Errorf("decode body: %w", err)
 	}
+	// Drain before close so the connection can be pooled for the next page.
 	_, _ = io.Copy(io.Discard, resp.Body)
 	return batch, resp.Header.Get("Link"), nil
 }

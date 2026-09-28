@@ -12,8 +12,8 @@ import (
 	"strings"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // classroomTeamName derives the GitHub team name for a classroom:

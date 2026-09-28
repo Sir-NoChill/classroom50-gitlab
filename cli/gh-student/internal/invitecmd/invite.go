@@ -16,11 +16,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/localgit"
 	"github.com/foundation50/classroom50-cli-shared/reponame"
 	"github.com/foundation50/gh-student/internal/assignments"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
-	"github.com/foundation50/gh-student/internal/githubapi"
 )
 
 func NewCmd() *cobra.Command {
@@ -59,7 +59,7 @@ func NewCmd() *cobra.Command {
 			}
 			org, repo := parts[0], parts[1]
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh student")
 			if err != nil {
 				return err
 			}

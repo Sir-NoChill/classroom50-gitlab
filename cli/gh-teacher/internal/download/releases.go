@@ -16,8 +16,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // release / releaseAsset: only the fields download consumes. Other keys are

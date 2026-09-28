@@ -16,9 +16,9 @@ import (
 	"slices"
 
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 // Stable ruleset names so re-running init is idempotent — Ensure reconciles

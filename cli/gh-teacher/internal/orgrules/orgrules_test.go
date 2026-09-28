@@ -11,8 +11,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
 )
 
 const org = "cs50-fall-2026"

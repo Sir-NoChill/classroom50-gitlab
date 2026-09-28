@@ -18,6 +18,7 @@ import (
 	"github.com/foundation50/classroom50-cli-shared/contract"
 	"github.com/foundation50/classroom50-cli-shared/ghui"
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
+	ghapi "github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/localgit"
 	"github.com/foundation50/classroom50-cli-shared/reponame"
 	"github.com/foundation50/classroom50-cli-shared/updatecheck"
@@ -109,7 +110,7 @@ func acceptCmd() *cobra.Command {
 				}
 			}
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := ghapi.RequireAuthClient(cmd, "gh student")
 			if err != nil {
 				return err
 			}
@@ -173,14 +174,14 @@ type OrgStatus struct {
 }
 
 // checkOrgStatus returns the authed user's membership in org.
-func checkOrgStatus(client githubapi.Client, org string) (OrgStatus, error) {
+func checkOrgStatus(client ghapi.Client, org string) (OrgStatus, error) {
 	path := fmt.Sprintf("user/memberships/orgs/%s", url.PathEscape(org))
 	var resp struct {
 		State string `json:"state"`
 		Role  string `json:"role"`
 	}
 	if err := client.Get(path, &resp); err != nil {
-		if httpErr, ok := errors.AsType[*githubapi.HTTPError](err); ok {
+		if httpErr, ok := errors.AsType[*ghapi.HTTPError](err); ok {
 			return OrgStatus{
 				StatusCode: httpErr.StatusCode,
 			}, nil
@@ -204,14 +205,14 @@ type AcceptStatus struct {
 // team. 2xx + active => true, a definitive 404 => false; any other error (e.g.
 // transient) propagates so the caller fails OPEN rather than blocking a real
 // student on a blip.
-func isActiveTeamMember(client githubapi.Client, org, teamSlug, username string) (bool, error) {
+func isActiveTeamMember(client ghapi.Client, org, teamSlug, username string) (bool, error) {
 	path := fmt.Sprintf("orgs/%s/teams/%s/memberships/%s",
 		url.PathEscape(org), url.PathEscape(teamSlug), url.PathEscape(username))
 	var resp struct {
 		State string `json:"state"`
 	}
 	if err := client.Get(path, &resp); err != nil {
-		if httpErr, ok := errors.AsType[*githubapi.HTTPError](err); ok {
+		if httpErr, ok := errors.AsType[*ghapi.HTTPError](err); ok {
 			if httpErr.StatusCode == http.StatusNotFound {
 				return false, nil
 			}
@@ -227,7 +228,7 @@ func isActiveTeamMember(client githubapi.Client, org, teamSlug, username string)
 // first). A transient read propagates (fail-open); membership short-circuits to
 // nil before any later probe can error, so an enrolled student is never blocked
 // by an unrelated blip. Only a full set of definitive non-member answers blocks.
-func assertEnrolledOrStaff(client githubapi.Client, org, classroom, username string) error {
+func assertEnrolledOrStaff(client ghapi.Client, org, classroom, username string) error {
 	for _, slug := range contract.ClassroomTeamSlugs(classroom) {
 		member, err := isActiveTeamMember(client, org, slug, username)
 		if err != nil {
@@ -241,7 +242,7 @@ func assertEnrolledOrStaff(client githubapi.Client, org, classroom, username str
 }
 
 // acceptOrgInvite PATCHes the user's pending org membership to "active".
-func acceptOrgInvite(client githubapi.Client, org string) (AcceptStatus, error) {
+func acceptOrgInvite(client ghapi.Client, org string) (AcceptStatus, error) {
 	body, err := json.Marshal(map[string]string{"state": "active"})
 	if err != nil {
 		return AcceptStatus{}, fmt.Errorf("encode body: %w", err)
@@ -249,7 +250,7 @@ func acceptOrgInvite(client githubapi.Client, org string) (AcceptStatus, error) 
 
 	path := fmt.Sprintf("user/memberships/orgs/%s", url.PathEscape(org))
 	if err := client.Patch(path, bytes.NewReader(body), nil); err != nil {
-		if httpErr, ok := errors.AsType[*githubapi.HTTPError](err); ok {
+		if httpErr, ok := errors.AsType[*ghapi.HTTPError](err); ok {
 			return AcceptStatus{
 				StatusCode: httpErr.StatusCode,
 			}, nil
@@ -326,7 +327,7 @@ func assertModeCoherentForCreate(assignment, mode string, maxGroupSize int, team
 //   - not on a team, student formation → --new-team founds a team (the
 //     student becomes its GitHub team maintainer), else an error explains
 //     the two ways to get one.
-func resolveTeamMembership(client githubapi.Client, u *ui.UI, org, classroom, assignment, username string, entry assignments.Entry, isOwner, newTeam bool, teamName string) (groupteam.Membership, error) {
+func resolveTeamMembership(client ghapi.Client, u *ui.UI, org, classroom, assignment, username string, entry assignments.Entry, isOwner, newTeam bool, teamName string) (groupteam.Membership, error) {
 	membership, found, err := groupteam.MyTeam(client, org, classroom, assignment)
 	if err != nil {
 		return groupteam.Membership{}, err
@@ -384,12 +385,12 @@ func resolveTeamMembership(client githubapi.Client, u *ui.UI, org, classroom, as
 	return created, nil
 }
 
-func acceptAssignment(cmd *cobra.Command, client githubapi.Client, u *ui.UI, out io.Writer, org, classroom, assignment, secret string, isOwner, newTeam bool, teamName string) error {
+func acceptAssignment(cmd *cobra.Command, client ghapi.Client, u *ui.UI, out io.Writer, org, classroom, assignment, secret string, isOwner, newTeam bool, teamName string) error {
 	verbose, _ := cmd.Flags().GetBool("verbose")
 
 	// The acceptor owns the repo, so capture their immutable id and the
 	// accept time alongside the login (rename-safe github_id identity).
-	username, ownerID, err := githubapi.CurrentUser(client)
+	username, ownerID, err := ghapi.CurrentUser(client)
 	if err != nil {
 		return fmt.Errorf("looking up the signed-in GitHub user: %w", err)
 	}
@@ -686,7 +687,7 @@ type acceptRepoParams struct {
 //   - alreadyExisted + marker missing → half-finished prior accept; re-run
 //     the idempotent provisioning to repair it.
 //   - freshly created → provision normally.
-func acceptIntoRepo(client githubapi.Client, u *ui.UI, verbose bool, out io.Writer, p acceptRepoParams) error {
+func acceptIntoRepo(client ghapi.Client, u *ui.UI, verbose bool, out io.Writer, p acceptRepoParams) error {
 	// No control files means no marker to probe: an existing repo IS an accepted
 	// repo (see acceptWithoutSetupCommit).
 	if p.emptyRepo || p.noAutograder {
@@ -771,7 +772,7 @@ func acceptIntoRepo(client githubapi.Client, u *ui.UI, verbose bool, out io.Writ
 // it), so there is no marker to probe or read back. Provisioning is the founder
 // grant (plus team attach); no_autograder also gets Pages and the Feedback PR,
 // whose base is the root commit unless a legacy marker exists.
-func acceptWithoutSetupCommit(client githubapi.Client, u *ui.UI, verbose bool, out io.Writer, p acceptRepoParams) error {
+func acceptWithoutSetupCommit(client ghapi.Client, u *ui.UI, verbose bool, out io.Writer, p acceptRepoParams) error {
 	resolveBase := func() (string, error) {
 		return feedbackBaseSHAOrRoot(client, p.org, p.repoName, p.branch)
 	}
@@ -847,7 +848,7 @@ func acceptWithoutSetupCommit(client githubapi.Client, u *ui.UI, verbose bool, o
 // accept isn't team mode. The accepting student holds creator-admin on the
 // repo at this point (the founder self-downgrade runs later), so the PUT
 // succeeds for teacher-formed teams too.
-func attachTeamStep(client githubapi.Client, p acceptRepoParams) error {
+func attachTeamStep(client ghapi.Client, p acceptRepoParams) error {
 	if p.teamSlug == "" {
 		return nil
 	}
@@ -861,7 +862,7 @@ func attachTeamStep(client githubapi.Client, p acceptRepoParams) error {
 // re-asserted on heal, so a student's own later Pages change survives.
 // Best-effort: a refusal warns with the next step and never fails accept; 409
 // means a site already exists and is left alone.
-func enablePagesStep(client githubapi.Client, u *ui.UI, verbose bool, p acceptRepoParams) {
+func enablePagesStep(client ghapi.Client, u *ui.UI, verbose bool, p acceptRepoParams) {
 	if p.pages == nil {
 		return
 	}
@@ -879,14 +880,14 @@ func enablePagesStep(client githubapi.Client, u *ui.UI, verbose bool, p acceptRe
 // enablePagesOnReadyBranch is enablePagesStep for a caller that has already
 // waited for the branch (the no-setup-commit path waits once for Pages and
 // the Feedback PR together).
-func enablePagesOnReadyBranch(client githubapi.Client, u *ui.UI, verbose bool, p acceptRepoParams) {
+func enablePagesOnReadyBranch(client ghapi.Client, u *ui.UI, verbose bool, p acceptRepoParams) {
 	const msg = "Enabling GitHub Pages"
 	sp := u.Spinner(msg)
 	sp.Start()
 	enablePagesWithSpinner(client, u, verbose, p, sp, msg)
 }
 
-func enablePagesWithSpinner(client githubapi.Client, u *ui.UI, verbose bool, p acceptRepoParams, sp *ghui.Spinner, msg string) {
+func enablePagesWithSpinner(client ghapi.Client, u *ui.UI, verbose bool, p acceptRepoParams, sp *ghui.Spinner, msg string) {
 	body, ok := ghutil.PagesBodyForAssignment(p.pages.Source, p.pages.Branch, p.pages.Path, p.branch)
 	if !ok {
 		sp.Fail(msg)
@@ -941,7 +942,7 @@ func pagesRefusalHint(err error) string {
 // issue the PUT (it needs repo admin) — skips silently instead of warning on
 // every run. Best-effort throughout: the repo is healthy, so a failure must
 // not fail a re-run — warn instead.
-func attachTeamBestEffort(client githubapi.Client, u *ui.UI, _ bool, p acceptRepoParams) {
+func attachTeamBestEffort(client ghapi.Client, u *ui.UI, _ bool, p acceptRepoParams) {
 	if p.teamSlug == "" {
 		return
 	}
@@ -971,7 +972,7 @@ func attachTeamBestEffort(client githubapi.Client, u *ui.UI, _ bool, p acceptRep
 // The single caller (acceptIntoRepo) covers both the fresh-create and heal
 // paths. Mirrors the GUI's provisionAcceptedRepo so CLI and GUI heal a
 // half-finished accept identically.
-func provisionAcceptedRepo(client githubapi.Client, u *ui.UI, verbose bool, p acceptRepoParams, cfg classroomcfg.Config) error {
+func provisionAcceptedRepo(client ghapi.Client, u *ui.UI, verbose bool, p acceptRepoParams, cfg classroomcfg.Config) error {
 	// Pages goes before the control-files commit; see enablePagesStep.
 	enablePagesStep(client, u, verbose, p)
 
@@ -1035,7 +1036,7 @@ func provisionAcceptedRepo(client githubapi.Client, u *ui.UI, verbose bool, p ac
 // runner resolves — freezing there would make the runner refuse to maintain the
 // PR for the repo's whole life. On a fresh accept the lookup returns the commit
 // just written (or fails on read lag), so falling back to it is correct.
-func feedbackBaseSHA(client githubapi.Client, org, repoName, branch, committedSHA string) string {
+func feedbackBaseSHA(client ghapi.Client, org, repoName, branch, committedSHA string) string {
 	if sha, err := acceptCommitSHA(client, org, repoName, branch); err == nil && sha != "" {
 		return sha
 	}
@@ -1051,7 +1052,7 @@ func feedbackBaseSHA(client githubapi.Client, org, repoName, branch, committedSH
 // absorbs on the branches API). So a single 404 isn't definitive: poll with a
 // short backoff and only fail — with an actionable re-run hint — when the
 // marker is still missing.
-func verifyProvisioned(client githubapi.Client, org, repoName string) error {
+func verifyProvisioned(client ghapi.Client, org, repoName string) error {
 	var lastErr error
 	for attempt := range verifyProvisionAttempts {
 		ok, err := repoFileExists(client, org, repoName, classroomcfg.MetadataPath)
@@ -1098,7 +1099,7 @@ var (
 // repoFileExists reports whether `path` is readable on org/repoName via the
 // contents API. 404 → false; other errors propagate so a transient failure
 // isn't misread as "missing".
-func repoFileExists(client githubapi.Client, org, repoName, path string) (bool, error) {
+func repoFileExists(client ghapi.Client, org, repoName, path string) (bool, error) {
 	return classroomcfg.FileExists(client, org, repoName, path)
 }
 
@@ -1114,14 +1115,14 @@ func classroomFromRepo(repoName string) string {
 
 // is422AlreadyExists matches GitHub's "already exists" 422 (duplicate ref,
 // duplicate label, existing repo).
-func is422AlreadyExists(httpErr *githubapi.HTTPError) bool {
+func is422AlreadyExists(httpErr *ghapi.HTTPError) bool {
 	return has422Message(httpErr, "already exists")
 }
 
 // is422NameTooLong matches GitHub's 422 for an over-100-char repo name. Told
 // apart from the "already exists" 422 whose recovery GET would otherwise 404 on
 // the never-created repo (foundation50/classroom50#691).
-func is422NameTooLong(httpErr *githubapi.HTTPError) bool {
+func is422NameTooLong(httpErr *ghapi.HTTPError) bool {
 	return has422Message(httpErr, "too long")
 }
 
@@ -1136,7 +1137,7 @@ func repoNameTooLongError(repoName string, cause error) error {
 // has422Message gates httpErrorMentions on a 422 status, so a caller that isn't
 // already switching on the status can't accept the same wording arriving from an
 // unrelated failure.
-func has422Message(httpErr *githubapi.HTTPError, needle string) bool {
+func has422Message(httpErr *ghapi.HTTPError, needle string) bool {
 	return httpErr.StatusCode == http.StatusUnprocessableEntity &&
 		httpErrorMentions(httpErr, needle)
 }
@@ -1144,7 +1145,7 @@ func has422Message(httpErr *githubapi.HTTPError, needle string) bool {
 // httpErrorMentions reports whether needle (lower-case) appears in the error's
 // top-level message or in any Errors[] item. GitHub puts the reason in either
 // slot depending on the endpoint.
-func httpErrorMentions(httpErr *githubapi.HTTPError, needle string) bool {
+func httpErrorMentions(httpErr *ghapi.HTTPError, needle string) bool {
 	if strings.Contains(strings.ToLower(httpErr.Message), needle) {
 		return true
 	}
@@ -1168,7 +1169,7 @@ const orgRepoCreationDeniedSignature = "admin access to the organization"
 // surfaces as 403, and rendering a throttle as "your org blocks repo creation" is
 // the mislabeling #413 exists to remove.
 func is403OrgRepoCreationDenied(err error) bool {
-	httpErr, ok := errors.AsType[*githubapi.HTTPError](err)
+	httpErr, ok := errors.AsType[*ghapi.HTTPError](err)
 	if !ok || httpErr.StatusCode != http.StatusForbidden {
 		return false
 	}
@@ -1195,7 +1196,7 @@ func orgRepoCreationDeniedError(org string, cause error) error {
 // Triggers the fall-back-to-private retry so an accept never fails on
 // visibility alone.
 func isPublicRepoCreationDenied(err error) bool {
-	httpErr, ok := errors.AsType[*githubapi.HTTPError](err)
+	httpErr, ok := errors.AsType[*ghapi.HTTPError](err)
 	if !ok {
 		return false
 	}
@@ -1220,7 +1221,7 @@ var oauthRestrictionOrg = regexp.MustCompile("(?i)`([^`]+)`\\s+organization has 
 // classroom org is an ordinary same-org restriction, not the cross-org-fork
 // case). Empty string when the body doesn't carry the pattern.
 func forkParentOwnerFromRestriction(err error, classroomOrg string) string {
-	httpErr, ok := errors.AsType[*githubapi.HTTPError](err)
+	httpErr, ok := errors.AsType[*ghapi.HTTPError](err)
 	if !ok {
 		return ""
 	}
@@ -1238,7 +1239,7 @@ func forkParentOwnerFromRestriction(err error, classroomOrg string) string {
 // crossOrgForkParentOwner probes the template repo for a cross-org fork parent
 // as a fallback when GitHub's 403 body didn't name the org. Best-effort: any
 // read failure (including the same restriction re-blocking this read) yields "".
-func crossOrgForkParentOwner(client githubapi.Client, owner, repo, classroomOrg string) string {
+func crossOrgForkParentOwner(client ghapi.Client, owner, repo, classroomOrg string) string {
 	var resp struct {
 		Fork   bool `json:"fork"`
 		Parent struct {
@@ -1326,7 +1327,7 @@ func printCloneInstructions(u *ui.UI, out io.Writer, fullName, htmlURL string) e
 // GET /users/{username}, best-effort: any failure (404, transient 5xx,
 // rate-limit) returns nil so the caller records owner_id as null rather than
 // aborting the accept.
-func lookupUserID(client githubapi.Client, username string) *int64 {
+func lookupUserID(client ghapi.Client, username string) *int64 {
 	var user struct {
 		ID int64 `json:"id"`
 	}
@@ -1431,7 +1432,7 @@ func resolveRepoFeaturePatchBody(features *assignments.RepoFeatures, templated b
 // can't silently drop a forced override. Returns the successful PATCH echo's
 // GeneratedRepo (or nil when nothing was sent / both attempts failed). Fail-open
 // by contract — the caller keeps the create/generate echo on a nil return.
-func patchRepoFeatures(client githubapi.Client, u *ui.UI, verbose bool, org, repo string, full, explicit map[string]any) *GeneratedRepo {
+func patchRepoFeatures(client ghapi.Client, u *ui.UI, verbose bool, org, repo string, full, explicit map[string]any) *GeneratedRepo {
 	patchPath := fmt.Sprintf("repos/%s/%s", url.PathEscape(org), url.PathEscape(repo))
 	attempt := func(body map[string]any) (*GeneratedRepo, error) {
 		encoded, err := json.Marshal(body)
@@ -1478,7 +1479,7 @@ func patchRepoFeatures(client githubapi.Client, u *ui.UI, verbose bool, org, rep
 // generate → cross-org visibility message (template not readable by the
 // student). 422-already-exists → alreadyExisted=true and the PATCH is skipped
 // so re-runs don't disturb an existing repo.
-func createTemplatedAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbose bool, username, classroom, assignment, org string, tmpl assignments.TemplateRef, features *assignments.RepoFeatures, includeAllBranches, public bool) (htmlURL, fullName, defaultBranch string, alreadyExisted bool, err error) {
+func createTemplatedAssignmentRepoInOrg(client ghapi.Client, u *ui.UI, verbose bool, username, classroom, assignment, org string, tmpl assignments.TemplateRef, features *assignments.RepoFeatures, includeAllBranches, public bool) (htmlURL, fullName, defaultBranch string, alreadyExisted bool, err error) {
 	newRepoName := reponame.Name(classroom, assignment, username)
 	createBody, err := json.Marshal(map[string]any{
 		"owner":                org,
@@ -1494,7 +1495,7 @@ func createTemplatedAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbo
 
 	var created GeneratedRepo
 	if err := client.Post(createPath, bytes.NewReader(createBody), &created); err != nil {
-		if httpErr, ok := errors.AsType[*githubapi.HTTPError](err); ok {
+		if httpErr, ok := errors.AsType[*ghapi.HTTPError](err); ok {
 			switch httpErr.StatusCode {
 			case http.StatusUnprocessableEntity:
 				if is422NameTooLong(httpErr) {
@@ -1589,7 +1590,7 @@ func createTemplatedAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbo
 	// copied yet. Wait for the branch to actually materialize and use that, so a
 	// `master`-default template doesn't pin the shim + commit at a `heads/main`
 	// ref that never exists.
-	genBranch = githubapi.ResolveSettledDefaultBranch(client, org, newRepoName, defaultBranchOrMain(genBranch))
+	genBranch = ghapi.ResolveSettledDefaultBranch(client, org, newRepoName, defaultBranchOrMain(genBranch))
 	return created.HTMLURL, created.FullName, defaultBranchOrMain(genBranch), false, nil
 }
 
@@ -1607,7 +1608,7 @@ func createTemplatedAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbo
 // absent key at GitHub's own create default; an explicit true/false forces it),
 // fail-open like the templated path. 422-already-exists → alreadyExisted=true
 // and the PATCH is skipped so re-runs don't disturb an existing repo.
-func createEmptyAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbose bool, username, classroom, assignment, org string, autoInit bool, features *assignments.RepoFeatures, public bool) (htmlURL, fullName, defaultBranch string, alreadyExisted bool, err error) {
+func createEmptyAssignmentRepoInOrg(client ghapi.Client, u *ui.UI, verbose bool, username, classroom, assignment, org string, autoInit bool, features *assignments.RepoFeatures, public bool) (htmlURL, fullName, defaultBranch string, alreadyExisted bool, err error) {
 	newRepoName := reponame.Name(classroom, assignment, username)
 	createBody, err := json.Marshal(map[string]any{
 		"name":      newRepoName,
@@ -1622,7 +1623,7 @@ func createEmptyAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbose b
 
 	var created GeneratedRepo
 	if err := client.Post(createPath, bytes.NewReader(createBody), &created); err != nil {
-		if httpErr, ok := errors.AsType[*githubapi.HTTPError](err); ok {
+		if httpErr, ok := errors.AsType[*ghapi.HTTPError](err); ok {
 			switch httpErr.StatusCode {
 			case http.StatusUnprocessableEntity:
 				if is422NameTooLong(httpErr) {
@@ -1673,7 +1674,7 @@ func createEmptyAssignmentRepoInOrg(client githubapi.Client, u *ui.UI, verbose b
 // returned as an error so the caller can fall back to the assignment repo's own
 // branch rather than a wrong `@main` ref that would 404 the runner; an empty
 // value falls back to "main" (an auto_init repo's default).
-func resolveConfigRepoBranch(client githubapi.Client, org string) (string, error) {
+func resolveConfigRepoBranch(client ghapi.Client, org string) (string, error) {
 	var repo struct {
 		DefaultBranch string `json:"default_branch"`
 	}
@@ -1729,8 +1730,8 @@ func founderPermission(mode, studentPermission string) string {
 // gradebook per-repo / bulk access editors), where a DIFFERENT actor changes a
 // student's role and a read-back can meaningfully confirm it. Mirrors the web
 // addFounderCollaborator.
-func inviteFounder(client githubapi.Client, u *ui.UI, verbose bool, username, org, repoName, permission string) error {
-	if _, err := githubapi.SetCollaborator(client, org, repoName, username, permission); err != nil {
+func inviteFounder(client ghapi.Client, u *ui.UI, verbose bool, username, org, repoName, permission string) error {
+	if _, err := ghapi.SetCollaborator(client, org, repoName, username, permission); err != nil {
 		return err
 	}
 

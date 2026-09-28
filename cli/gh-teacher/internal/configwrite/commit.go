@@ -2,10 +2,11 @@
 // optimistic-update-with-rebase Tree-commit helpers every teacher-side mutation
 // of <org>/classroom50 goes through, plus the workflow-scope classifier wired
 // into that loop. Write-side sibling of internal/configrepo (reads). Reaches
-// GitHub only through internal/githubapi.
+// GitHub only through internal/ghapi.
 package configwrite
 
 import (
+	ghapi "github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/gittree"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
@@ -29,7 +30,7 @@ type CommitChange = gittree.Change
 // Callers that close over a per-attempt accumulator must reset it at the top of
 // each build call so a retry doesn't see stale state.
 func CommitTree(
-	client githubapi.Client,
+	client ghapi.Client,
 	owner, repo, branch, message string,
 	build func(parentSHA string) (map[string]string, error),
 ) (string, error) {
@@ -50,7 +51,7 @@ func CommitTree(
 // Return shape matches CommitTree. Reset any per-attempt accumulators at the
 // top of each build call so a retry doesn't see stale state.
 func CommitTreeChange(
-	client githubapi.Client,
+	client ghapi.Client,
 	owner, repo, branch, message string,
 	build func(parentSHA string) (CommitChange, error),
 ) (string, error) {

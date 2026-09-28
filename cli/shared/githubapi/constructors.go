@@ -6,13 +6,13 @@ import (
 	"github.com/foundation50/classroom50-cli-shared/ghauth"
 )
 
-// ClientOptions aliases go-gh's api.ClientOptions for the few call sites
-// that build a non-default client (e.g., a client authenticated as a
-// supplied service token).
+// ClientOptions aliases go-gh's api.ClientOptions for the few call sites that
+// build a non-default client (e.g., a client authenticated as a supplied
+// service token, or the test client in cli/shared/githubtest).
 type ClientOptions = api.ClientOptions
 
-// DefaultClient returns the default REST client for the configured host,
-// as a Client, so callers don't import go-gh.
+// DefaultClient returns the default REST client for the configured host, as a
+// Client, so callers don't import go-gh.
 func DefaultClient() (Client, error) {
 	return ghauth.NewRESTClient(ClientOptions{})
 }

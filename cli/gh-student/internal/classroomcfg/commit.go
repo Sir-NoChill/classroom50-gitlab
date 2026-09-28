@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/gittree"
-	"github.com/foundation50/gh-student/internal/githubapi"
 )
 
 // commitFilesAttempts bounds read-parent + build-tree retries at 200ms × 2^n

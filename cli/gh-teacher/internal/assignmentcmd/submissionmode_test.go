@@ -14,7 +14,7 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // The two accept clients' shims share the trigger block but differ in their

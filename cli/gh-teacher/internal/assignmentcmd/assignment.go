@@ -18,6 +18,7 @@ import (
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
 	"github.com/foundation50/classroom50-cli-shared/contract"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/output"
 	"github.com/foundation50/classroom50-cli-shared/validate"
 	autograderseam "github.com/foundation50/gh-teacher/internal/autograder"
@@ -25,7 +26,6 @@ import (
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/configwrite"
 	"github.com/foundation50/gh-teacher/internal/feedbackpr"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 func NewCmd() *cobra.Command {
@@ -293,7 +293,7 @@ func assignmentAddCmd() *cobra.Command {
 				tests, testDefaults = parsedTests.Tests, parsedTests.Defaults
 			}
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -430,7 +430,7 @@ func assignmentRemoveCmd() *cobra.Command {
 			if err := validate.ShortName(slug, "slug"); err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -478,7 +478,7 @@ func assignmentListCmd() *cobra.Command {
 			if err := validate.ShortName(classroom, "classroom"); err != nil {
 				return err
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

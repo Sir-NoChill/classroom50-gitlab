@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 // LoadAssignments reads and parses a classroom's assignments.json at `ref`.

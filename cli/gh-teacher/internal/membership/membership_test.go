@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 	"github.com/foundation50/gh-teacher/internal/cliutil"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
 )
 
 // postInvitationsErr drives a POST /orgs/{org}/invitations failure through

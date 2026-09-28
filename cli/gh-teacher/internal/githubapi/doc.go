@@ -1,8 +1,7 @@
-// Package githubapi is the single seam between gh-teacher and the GitHub REST
-// API — the ONLY package permitted to import go-gh/v2/pkg/api (CI-enforced).
-// Every domain talks to GitHub through the transport-verb Client interface
-// here, plus the generic pagination and git-tree-commit plumbing on top.
-//
-// The interface is transport-verb-level (Get/Post/Request), not per-operation —
-// domain shaping belongs in the service layer.
+// Package githubapi holds gh-teacher's GitHub-specific domain operations that
+// build on the shared transport seam (cli/shared/githubapi): org plan/billing
+// reads and the optimistic tree-commit-with-rebase loop. The transport verbs,
+// pagination, auth, and forge-neutral helpers live in the shared package; this
+// package is what stays teacher-specific until the Forge interface (F2+) can
+// model these operations.
 package githubapi

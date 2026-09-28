@@ -14,6 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	ghapi "github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
 	"github.com/foundation50/gh-teacher/internal/githubapi"
 	"github.com/foundation50/gh-teacher/internal/orgpolicy"
@@ -67,7 +68,7 @@ func NewCmd() *cobra.Command {
 				return errors.New("org must not be empty")
 			}
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := ghapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}
@@ -182,7 +183,7 @@ func (b budgetCapResult) isWarn() bool {
 // buildAuditReport reads the org back and classifies every in-scope setting as
 // enforced/unenforced, plus the always-unreadable manual items. A read failure
 // yields ReadOK=false with LockdownComplete=false (conservatively a failure).
-func buildAuditReport(client githubapi.Client, org, plan string) auditReport {
+func buildAuditReport(client ghapi.Client, org, plan string) auditReport {
 	settingsURL := fmt.Sprintf("https://github.com/organizations/%s/settings/member_privileges", org)
 	report := auditReport{
 		Org:              org,
@@ -247,7 +248,7 @@ func buildAuditReport(client githubapi.Client, org, plan string) auditReport {
 // readOrgMemberSettings GETs the org and returns the raw field map. Separated
 // from init's verifyOrgDefaults (which also emits warnings) so audit reads
 // clean.
-func readOrgMemberSettings(client githubapi.Client, org string) (map[string]any, error) {
+func readOrgMemberSettings(client ghapi.Client, org string) (map[string]any, error) {
 	path := fmt.Sprintf("orgs/%s", url.PathEscape(org))
 	var live map[string]any
 	if err := client.Get(path, &live); err != nil {
@@ -259,7 +260,7 @@ func readOrgMemberSettings(client githubapi.Client, org string) (map[string]any,
 // classifyBudgetCap reads the org's billing budgets and classifies the Actions
 // cap. A read failure yields ReadOK=false (advisory, inconclusive) rather than
 // a false critical — mirroring how the member-default read-back degrades.
-func classifyBudgetCap(client githubapi.Client, org string) budgetCapResult {
+func classifyBudgetCap(client ghapi.Client, org string) budgetCapResult {
 	res := budgetCapResult{SettingsURL: orgpolicy.OrgBudgetsURL(org)}
 	budgets, err := githubapi.ListOrgBudgets(client, org)
 	if err != nil {

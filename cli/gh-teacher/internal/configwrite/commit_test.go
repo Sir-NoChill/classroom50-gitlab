@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // TestCommitTree_RetriesOnNonFastForward exercises the rebase loop

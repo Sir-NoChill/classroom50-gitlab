@@ -27,11 +27,11 @@ import (
 	"github.com/foundation50/classroom50-cli-shared/ghui"
 	"github.com/foundation50/classroom50-cli-shared/ghutil"
 	"github.com/foundation50/classroom50-cli-shared/gitexec"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/classroom50-cli-shared/ignorematch"
 	"github.com/foundation50/classroom50-cli-shared/localgit"
 	"github.com/foundation50/gh-student/internal/assignments"
 	"github.com/foundation50/gh-student/internal/classroomcfg"
-	"github.com/foundation50/gh-student/internal/githubapi"
 	identitypkg "github.com/foundation50/gh-student/internal/identity"
 	"github.com/foundation50/gh-student/internal/ui"
 )
@@ -75,7 +75,7 @@ func NewCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
 
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh student")
 			if err != nil {
 				return err
 			}

@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 	"github.com/foundation50/gh-teacher/internal/configrepo"
-	"github.com/foundation50/gh-teacher/internal/githubapi"
 )
 
 func teamCreateCmd() *cobra.Command {
@@ -227,7 +227,7 @@ func teamCopyCmd() *cobra.Command {
 			if source == scope.Assignment {
 				return errors.New("--from must name a different assignment")
 			}
-			client, err := githubapi.RequireAuthClient(cmd)
+			client, err := githubapi.RequireAuthClient(cmd, "gh teacher")
 			if err != nil {
 				return err
 			}

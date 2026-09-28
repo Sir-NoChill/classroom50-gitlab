@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // lockFixture serves a single-classroom config repo plus the commit-tree write

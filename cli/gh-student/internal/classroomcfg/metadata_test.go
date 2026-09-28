@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/foundation50/gh-student/internal/githubapi"
+	"github.com/foundation50/classroom50-cli-shared/githubapi"
 )
 
 func TestReadConfig_PreV1BodyParsesWithoutNewFields(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/foundation50/classroom50-cli-shared/assignment"
-	"github.com/foundation50/gh-teacher/internal/githubtest"
+	"github.com/foundation50/classroom50-cli-shared/githubtest"
 )
 
 // reuseFixture serves a config repo with two classrooms (source +
